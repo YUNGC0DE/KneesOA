@@ -1,7 +1,7 @@
 import os
 
 import torch
-from timm.optim import RAdam
+from torch.optim import SGD
 from torch.utils.tensorboard import SummaryWriter
 from clearml import Task
 
@@ -29,9 +29,11 @@ def train_model(args):
     net.to(device)
     os.makedirs(os.path.join(DataConfig.models_dir, args.task_name), exist_ok=True)
 
-    loss = torch.nn.CrossEntropyLoss(weight=torch.tensor([1, 1, 1, 1.2, 1.6], device=device))
-    optimizer = RAdam(net.parameters(), lr=args.lr)
+    # weights = torch.tensor([0.2, 1, 1, 1.2, 1.6], device=device)
+    loss = torch.nn.CrossEntropyLoss()
+    optimizer = SGD(net.parameters(), lr=args.lr, momentum=0.9)
     lr_scheduler = CustomScheduler(optimizer, mode="max", factor=args.gamma_factor, patience=args.patience)
-    train_net(net, train_loader, val_loader, optimizer, loss, lr_scheduler, writer, device, args)
-    balanced_accuracy = eval_net(net, test_loader, device)
+    logger = task.get_logger().current_logger()
+    train_net(net, train_loader, val_loader, optimizer, loss, lr_scheduler, writer, device, args, logger)
+    balanced_accuracy = eval_net(net, test_loader, device, logger, 300)
     writer.add_scalar("TEST_Balanced_accuracy", balanced_accuracy, 0)

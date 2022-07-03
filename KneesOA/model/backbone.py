@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import torch
 from torch import nn
 import torch.nn.functional as F
@@ -177,7 +178,10 @@ class ResNet(nn.Module):
             self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
             self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
         self.to_vector = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc = nn.Linear(2048, 5)
+        self.fc4 = nn.Linear(2048, 256)
+        self.fc3 = nn.Linear(1024, 256)
+        self.fc2 = nn.Linear(512, 256)
+        self.classifier = nn.Linear(256 * 3, 5)
 
     def _make_layer(self, block, planes, blocks, stride=1, dilation=1, is_first=True):
         downsample = None
@@ -232,9 +236,17 @@ class ResNet(nn.Module):
 
         x = self.layer1(x)
         x = self.layer2(x)
+        x_2 = self.to_vector(self.relu(x)).reshape(x.shape[0], -1)
+        x_2 = self.relu(self.fc2(x_2))
+
         x = self.layer3(x)
+        x_3 = self.to_vector(self.relu(x)).reshape(x.shape[0], -1)
+        x_3 = self.relu(self.fc3(x_3))
+
         x = self.layer4(x)
-        x = self.relu(x)
-        x = self.to_vector(x).reshape(x.shape[0], -1)
-        x = self.fc(x)
-        return x
+        x_4 = self.to_vector(self.relu(x)).reshape(x.shape[0], -1)
+        x_4 = self.relu(self.fc4(x_4))
+
+        output = torch.cat([x_2, x_3, x_4], dim=1)
+        output = self.classifier(self.relu(output))
+        return output

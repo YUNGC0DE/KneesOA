@@ -10,6 +10,7 @@ class KneeOADataset(Dataset):
     def __init__(self, split_path: str):
         super().__init__()
         self.dataframe = pd.read_csv(split_path)
+        self.targets = self.dataframe.iloc[:, -1].to_list()
 
     def __getitem__(self, idx):
         row = self.dataframe.iloc[idx, :]
