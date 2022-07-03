@@ -163,7 +163,7 @@ class ResNet(nn.Module):
             Conv2d(stem_width, stem_width * 2, kernel_size=3, stride=1, padding=1, bias=False),
         )
         self.bn1 = BatchNorm2d(self.inplanes)
-        self.relu = nn.ReLU(inplace=True)
+        self.relu = nn.ReLU(inplace=False)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         self.layer1 = self._make_layer(block, 64, layers[0], is_first=False)
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
@@ -176,7 +176,8 @@ class ResNet(nn.Module):
         else:
             self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
             self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
-        self.fc = nn.Linear(200704, 5)
+        self.to_vector = nn.AdaptiveAvgPool2d((1, 1))
+        self.fc = nn.Linear(2048, 5)
 
     def _make_layer(self, block, planes, blocks, stride=1, dilation=1, is_first=True):
         downsample = None
@@ -233,5 +234,7 @@ class ResNet(nn.Module):
         x = self.layer2(x)
         x = self.layer3(x)
         x = self.layer4(x)
-        x = self.fc(x.flatten())
+        x = self.relu(x)
+        x = self.to_vector(x).reshape(x.shape[0], -1)
+        x = self.fc(x)
         return x

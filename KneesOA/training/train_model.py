@@ -5,6 +5,7 @@ from timm.optim import RAdam
 from torch.utils.tensorboard import SummaryWriter
 from clearml import Task
 
+from KneesOA.config import DataConfig
 from KneesOA.data.scheduler import CustomScheduler
 from KneesOA.data.utils import create_loaders
 from KneesOA.model.utils import load_network, fix_seeds
@@ -26,11 +27,11 @@ def train_model(args):
     train_loader, test_loader, val_loader = create_loaders(args)
     net = load_network()
     net.to(device)
-    os.makedirs(args.model_dir, exist_ok=True)
+    os.makedirs(os.path.join(DataConfig.models_dir, args.task_name), exist_ok=True)
 
     loss = torch.nn.CrossEntropyLoss(weight=torch.tensor([1, 1, 1, 1.2, 1.6], device=device))
     optimizer = RAdam(net.parameters(), lr=args.lr)
     lr_scheduler = CustomScheduler(optimizer, mode="max", factor=args.gamma_factor, patience=args.patience)
-    train_net(net, train_loader, val_loader, optimizer, loss, lr_scheduler, writer, device)
-    accuracy = eval_net(net, test_loader, device)
-    writer.add_scalar("TEST_ACC", accuracy, 0)
+    train_net(net, train_loader, val_loader, optimizer, loss, lr_scheduler, writer, device, args)
+    balanced_accuracy = eval_net(net, test_loader, device)
+    writer.add_scalar("TEST_Balanced_accuracy", balanced_accuracy, 0)

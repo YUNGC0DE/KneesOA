@@ -25,12 +25,6 @@ def create_parser():
         help="path to a folder with data",
     )
     parser.add_argument(
-        "--model_dir",
-        type=str,
-        default=DataConfig.models_dir,
-        help="path to a folder with models",
-    )
-    parser.add_argument(
         "--train_file",
         type=str,
         help="path to a train set markup file",
