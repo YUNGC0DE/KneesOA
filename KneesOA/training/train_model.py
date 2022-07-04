@@ -1,7 +1,8 @@
 import os
 
 import torch
-from torch.optim import SGD
+from timm.optim import Lookahead
+from torch.optim import RAdam
 from torch.utils.tensorboard import SummaryWriter
 from clearml import Task
 
@@ -31,7 +32,8 @@ def train_model(args):
 
     # weights = torch.tensor([0.2, 1, 1, 1.2, 1.6], device=device)
     loss = torch.nn.CrossEntropyLoss()
-    optimizer = SGD(net.parameters(), lr=args.lr, momentum=0.9)
+    base_optimizer = RAdam(net.parameters(), lr=args.lr)
+    optimizer = Lookahead(base_optimizer)
     lr_scheduler = CustomScheduler(optimizer, mode="max", factor=args.gamma_factor, patience=args.patience)
     logger = task.get_logger().current_logger()
     train_net(net, train_loader, val_loader, optimizer, loss, lr_scheduler, writer, device, args, logger)
