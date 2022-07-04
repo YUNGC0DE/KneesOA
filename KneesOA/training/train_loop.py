@@ -2,7 +2,6 @@ import os
 
 import numpy as np
 import torch
-from matplotlib import pyplot as plt
 from tqdm import tqdm
 from sklearn.metrics import balanced_accuracy_score
 from sklearn.metrics import confusion_matrix
