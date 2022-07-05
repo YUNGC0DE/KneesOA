@@ -8,8 +8,8 @@ from KneesOA.model.utils import seed_worker
 
 def create_loaders(args):
     train_dataset = KneeOADataset(args.train_file)
-    test_dataset = KneeOADataset(args.test_file)
-    val_dataset = KneeOADataset(args.val_file)
+    test_dataset = KneeOADataset(args.test_file, test=True)
+    val_dataset = KneeOADataset(args.val_file, test=True)
 
     train_loader = DataLoader(
         train_dataset,
