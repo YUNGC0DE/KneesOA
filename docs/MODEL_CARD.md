@@ -1,5 +1,5 @@
 # Model Card
-###KneesOA v0.0.1.
+### KneesOA v0.0.1.
 Сервсис по классификации артроза коленей по шкале KL Grade (0-4)
 
 <img src="images/KL_grade.png">
