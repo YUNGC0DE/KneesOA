@@ -41,17 +41,17 @@
   * Шире, глубже, группы, радиксы и.тд
   * Конкатенации, суммации фичей на разных уровнях и с разных пулингов
   
-TODO: <b> Завести трансормер </b>
+TODO: <b> Завести трансформер </b>
 
 ## Test Metrics
 
 **Balanced Accuracy**: 70.3
 
-**Confusion Matrix**
+### Confusion Matrix
 <img src="images/cm.png">
 
-**Precision**
+### Precision
 <img src="images/precision.png">
 
-**Recall**
+### Recall
 <img src="images/recall.png">
